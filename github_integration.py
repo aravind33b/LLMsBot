@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import requests
 import re
 
-def fetch_github_files(owner: str, repo: str, path: str, extension: str, branch="main"):
+def fetch_github_files(owner: str, repo: str, path: str, branch="main"):
     load_dotenv()
     
     bearer_token: str = os.getenv("GITHUB_TOKEN")
@@ -26,7 +26,7 @@ def fetch_github_files(owner: str, repo: str, path: str, extension: str, branch=
         files = []
         items = get_files(url)
         for item in items:
-            if item['type'] == 'file' and item['name'].endswith(extension):
+            if item['type'] == 'file' and item['name'].endswith(('mdx', 'md')):
                 raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/refs/heads/{branch}/{item['path']}"
                 files.append((item['path'], raw_url))
             elif item['type'] == 'dir':
@@ -41,7 +41,7 @@ def fetch_github_files(owner: str, repo: str, path: str, extension: str, branch=
 
         def insert_into_dict(path_parts, url, current_dict):
             if len(path_parts) == 1:
-                file_name = clean_name(path_parts[0]).replace('.mdx', '').replace('-', ' ').title()
+                file_name = clean_name(path_parts[0]).replace('.mdx', '').replace('.md', '').replace('-', ' ').title()
                 current_dict[file_name] = url
             else:
                 #recursively create nested dictionaries
@@ -58,5 +58,5 @@ def fetch_github_files(owner: str, repo: str, path: str, extension: str, branch=
 
     all_files = fetch_files_recursive(base_url)
     indexed_files = arrange_files_on_topics(all_files)
-    print(f"Found {len(all_files)} files with extension {extension}")
+    print(f"Found {len(all_files)} files with extension {['mdx', 'md']}")
     return indexed_files

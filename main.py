@@ -17,13 +17,13 @@ def get_data_from_functions_table(supabase):
 
 def main():
 
-    # fetch all .mdx files
-    file_list = fetch_github_files("uniswap", "docs", "docs/contracts/v4", "mdx")
-    # print(file_list)
+    load_dotenv()
 
+    # fetch all .mdx files
+    file_list = fetch_github_files("uniswap", "docs", "docs/contracts/v4")
+    
     # extract data from .mdx files
     parsed_docs = process_all_docs(file_list)
-    # print(json.dumps(parsed_docs, indent=2))
 
     try:
         output_file = os.path.abspath('extracted_data.json')
@@ -48,7 +48,6 @@ def main():
     # generate llms.txt
     try:
         generate_llms_txt(extracted_data)
-        print("llms.txt has been successfully generated.")
     except Exception as e:
         print(f"Error generating llms.txt: {e}")
 
